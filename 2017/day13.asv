@@ -1,0 +1,111 @@
+%% Part 1
+% 036 32 13 70
+% Depth 2
+time = linspace(1,10, 1000);
+scannerPos = getScannerPos(2,time);
+plot(time, scannerPos);
+disp('Depth 2');
+disp(num2str(getScannerPos(2,1)))
+disp(num2str(getScannerPos(2,2)))
+disp(num2str(getScannerPos(2,3)))
+disp(num2str(getScannerPos(2,4)))
+disp(num2str(getScannerPos(2,5)))
+disp(num2str(getScannerPos(2,6)))
+% 1 1
+% 2 2
+% 3 1
+% 4 2
+% 5 1
+% 6 2
+
+disp('Depth 3');
+disp(num2str(getScannerPos(3,1)))
+disp(num2str(getScannerPos(3,2)))
+disp(num2str(getScannerPos(3,3)))
+disp(num2str(getScannerPos(3,4)))
+disp(num2str(getScannerPos(3,5)))
+disp(num2str(getScannerPos(3,6)))
+%%
+fid = fopen('day13input.txt');
+tline = fgetl(fid);
+layers = {};
+while ischar(tline)
+    splitStrings = strsplit(tline, ':');
+    layerString = regexprep(splitStrings{1}, '\s+', '');
+    depthString = regexprep(splitStrings{2}, '\s+', '');
+    layer = eval(layerString);
+    depth = eval(depthString);
+    matlabLayer = layer + 1; % Indexing from 1 instead of zero
+    
+    thisLayer = zeros(depth, 1);
+    thisLayer(1) = 1; % Initialize scanners at position 1
+    layers{matlabLayer} = thisLayer;
+    tline = fgetl(fid);
+end
+fclose(fid);
+layerDirection = ones(1, length(layers));
+
+tripSeverity = Inf; % Total trip severity
+delay = 0;
+
+layersFromStart = layers;
+
+while tripSeverity > 0
+    layers = layersFromStart;
+    if delay == 1
+        disp(['Day 13, part 1: ' num2str(tripSeverity)]);
+    end
+    tripSeverity = 0;
+    currentLayerNumber = 1;
+    for k = depth+1:length(layers) + delay
+        % We now move into layer 1
+        
+        if k > delay
+            % Check if there is a scanner here
+            thisLayer = layers{currentLayerNumber};
+            if isempty(thisLayer)
+                % Do nothing
+            elseif thisLayer(1) == 1
+                tripSeverity = tripSeverity + (k-1)*length(thisLayer);
+                if delay > 0
+                    break;
+                end
+            end
+            currentLayerNumber = currentLayerNumber + 1;
+        end
+        
+        % Move all the scanners
+        for kk = 1:length(layers)
+            thisLayer = layers{kk};
+            if isempty(thisLayer)
+                % Do nothing
+            else
+                scannerPos = find(thisLayer);
+                if scannerPos == 1
+                    % Change direction from -1 to 1
+                    layerDirection(kk) = 1;
+                elseif scannerPos == length(thisLayer)
+                    layerDirection(kk) = -1;
+                end
+                thisDir = layerDirection(kk);
+                thisLayer(scannerPos) = 0;
+                thisLayer(scannerPos + thisDir) = 1;
+                layers{kk} = thisLayer;
+            end
+        end
+        5;
+    end
+    delay = delay + 1;
+end
+
+bestDelay = delay - 1;
+disp(['Day 13, part 2: ' num2str(bestDelay)]);
+
+function scannerPos = getScannerPos(depth, time)
+x = mod(time, depth*2 - 1);
+x
+    scannerPos = x;
+else
+    scannerPos = x;
+end
+end
