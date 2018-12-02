@@ -1,0 +1,17 @@
+""" aoc_04_input.py
+
+    The purpose is to return a properly formatted input to aoc_04.py
+"""
+
+
+def get_input():
+    """ get_input()
+        Return the content of the input as expected by the solver.
+    """
+    rooms = []
+    with open('input') as input_file:
+        for line in input_file:
+            # Inputs are separated by comma
+            rooms.append(line)
+
+    return rooms
