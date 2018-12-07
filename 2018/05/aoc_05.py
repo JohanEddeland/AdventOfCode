@@ -8,27 +8,27 @@ import aoc_05_input
 
 def replace_all_polymer(aoc_input):
     aoc_input = aoc_input.replace('\n', '')
-    finished_loop = False
 
-    while not finished_loop:
-        replace_in_this_loop = 0
+    # Start counting at the second letter
+    current_letter_index = 1
 
-        if len(aoc_input) == 0:
-            finished_loop = True
-        for k in range(1, len(aoc_input)):
-            if k > len(aoc_input) - 1:
-                break
-            previous_letter = aoc_input[k - 1]
-            this_letter = aoc_input[k]
-            if same_type_different_polarity(this_letter, previous_letter):
-                aoc_input = replace_one_substring(aoc_input, k)
+    result = [aoc_input[0]]
 
-                replace_in_this_loop += 1
+    while current_letter_index < len(aoc_input):
+        if result:
+            previous_letter = result[-1]
+        else:
+            previous_letter = '\x00'
+        this_letter = aoc_input[current_letter_index]
 
-        if replace_in_this_loop == 0:
-            finished_loop = True
+        if same_type_different_polarity(this_letter, previous_letter):
+            result.pop()
+        else:
+            result.append(this_letter)
 
-    return aoc_input
+        current_letter_index += 1
+
+    return ''.join(result)
 
 
 def same_type_different_polarity(letter1, letter2):
@@ -57,6 +57,21 @@ def is_this_letter(lowercase_letter, letter):
         return False
 
 
+def solve_task2(aoc_input):
+    shortest_result = float('inf')
+    shortest_letter = '\x00'
+    for letter_counter in range(65, 91):
+        input_with_removed_letter = aoc_input.replace(chr(letter_counter), '')
+        input_with_removed_letter = input_with_removed_letter.replace(chr(letter_counter + 32), '')
+        final_result = replace_all_polymer(input_with_removed_letter)
+
+        if len(final_result) < shortest_result:
+            shortest_result = len(final_result)
+            shortest_letter = chr(letter_counter)
+
+    return shortest_result, shortest_letter
+
+
 def main():
     """ main()
 
@@ -66,19 +81,7 @@ def main():
     aoc_input = aoc_05_input.get_input()
 
     answer1 = replace_all_polymer(aoc_input)
-
-    shortest_result = 10000000
-    shortest_letter = '\x00'
-    for letter_counter in range(65, 91):
-        print('Checking ' + chr(letter_counter))
-
-        input_with_removed_letter = aoc_input.replace(chr(letter_counter), '')
-        input_with_removed_letter = input_with_removed_letter.replace(chr(letter_counter + 32), '')
-        final_result = replace_all_polymer(input_with_removed_letter)
-
-        if len(final_result) < shortest_result:
-            shortest_result = len(final_result)
-            shortest_letter = chr(letter_counter)
+    (shortest_result, shortest_letter) = solve_task2(aoc_input)
 
     print('Part 1: {}'.format(len(answer1)))
     print('Part 2: {}'.format(shortest_result))
